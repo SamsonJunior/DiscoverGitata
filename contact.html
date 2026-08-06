@@ -53,7 +53,10 @@
   <div class="wrap">
     <div class="grid grid-2" style="gap:60px; align-items:flex-start;">
       <div>
-        <form id="contact-form">
+        <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="d5477bce-4795-44a0-bc6a-ccd6a4a68c20">
+          <input type="hidden" name="subject" value="New message from Discover Gitata contact form">
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
           <div class="form-field">
             <label for="name">Full name</label>
             <input type="text" id="name" name="name" required>
@@ -81,6 +84,38 @@
           <button type="submit" class="btn btn-dark">Send message</button>
           <p class="form-note" id="form-status"></p>
         </form>
+        <script>
+          const contactForm = document.getElementById('contact-form');
+          const formStatus = document.getElementById('form-status');
+          if (contactForm) {
+            contactForm.addEventListener('submit', function (e) {
+              e.preventDefault();
+              const submitBtn = contactForm.querySelector('button[type="submit"]');
+              submitBtn.disabled = true;
+              formStatus.textContent = 'Sending...';
+              const formData = new FormData(contactForm);
+              fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: formData
+              })
+                .then(res => res.json())
+                .then(data => {
+                  submitBtn.disabled = false;
+                  if (data.success) {
+                    formStatus.textContent = "Thanks — your message has been sent. We'll get back to you soon.";
+                    contactForm.reset();
+                  } else {
+                    formStatus.textContent = 'Something went wrong. Please try again or reach us on WhatsApp.';
+                  }
+                })
+                .catch(() => {
+                  submitBtn.disabled = false;
+                  formStatus.textContent = 'Something went wrong. Please try again or reach us on WhatsApp.';
+                });
+            });
+          }
+        </script>
       </div>
       <div>
         <div class="card" style="margin-bottom:20px;">
